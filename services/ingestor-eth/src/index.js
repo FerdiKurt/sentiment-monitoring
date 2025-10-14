@@ -24,3 +24,12 @@ const UNIV3_SWAP_ABI = parseAbi([
   'event Swap(address indexed sender,address indexed recipient,int256 amount0,int256 amount1,uint160 sqrtPriceX96,uint128 liquidity,int24 tick)'
 ]);
 
+const client = createPublicClient({
+  chain: {
+    id: chain,
+    name: 'eth',
+    nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+    rpcUrls: { default: { http: [], webSocket: [process.env.RPC_URL] } }
+  },
+  transport: webSocket(process.env.RPC_URL)
+});

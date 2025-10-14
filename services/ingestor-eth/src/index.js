@@ -33,3 +33,24 @@ const client = createPublicClient({
   },
   transport: webSocket(process.env.RPC_URL)
 });
+
+function norm(a){ return getAddress(a); }
+
+async function readToken(addr) {
+  const [dec, sym] = await Promise.all([
+    client.readContract({ address: addr, abi: ERC20_ABI, functionName: 'decimals' }),
+    client.readContract({ address: addr, abi: ERC20_ABI, functionName: 'symbol' })
+  ]);
+  return { address: norm(addr), symbol: sym, decimals: Number(dec) };
+}
+
+async function readPoolMeta(addr) {
+  const [t0, t1, fee] = await Promise.all([
+    client.readContract({ address: addr, abi: UNIV3_POOL_ABI, functionName: 'token0' }),
+    client.readContract({ address: addr, abi: UNIV3_POOL_ABI, functionName: 'token1' }),
+    client.readContract({ address: addr, abi: UNIV3_POOL_ABI, functionName: 'fee' })
+  ]);
+  const tok0 = await readToken(t0);
+  const tok1 = await readToken(t1);
+  return { pool: norm(addr), fee: Number(fee), t0: tok0, t1: tok1 };
+}

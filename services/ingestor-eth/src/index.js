@@ -62,3 +62,8 @@ function priceFromAmounts(a0, a1, d0, d1) {
   return Math.abs(x1 / x0); // quote/base
 }
 
+function usdFromQuote(symbol, amount1, d1) {
+  if (!['USDC','USDT','DAI'].includes(symbol)) return null;
+  return Math.abs(Number(amount1) / 10**d1);
+}
+

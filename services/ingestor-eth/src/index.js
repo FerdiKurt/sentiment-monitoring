@@ -54,3 +54,11 @@ async function readPoolMeta(addr) {
   const tok1 = await readToken(t1);
   return { pool: norm(addr), fee: Number(fee), t0: tok0, t1: tok1 };
 }
+
+function priceFromAmounts(a0, a1, d0, d1) {
+  const x0 = Number(a0) / 10**d0;
+  const x1 = Number(a1) / 10**d1;
+  if (!x0 || !x1) return null;
+  return Math.abs(x1 / x0); // quote/base
+}
+

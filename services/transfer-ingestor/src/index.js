@@ -60,12 +60,7 @@ async function readMeta(addr) {
   }
 }
 
-function toBigIntSafe(v) {
-  if (typeof v === 'bigint') return v;
-  if (typeof v === 'number') return BigInt(v);
-  // strings: decimal or hex (0x…)
-  return BigInt(v);
-}
+
 
 function mkMessages(logs, addr, meta) {
   const messages = [];

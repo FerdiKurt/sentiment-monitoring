@@ -1,8 +1,8 @@
 import 'dotenv/config';
 import { Kafka, logLevel } from 'kafkajs';
 import {
-  createPublicClient, webSocket, getAddress,
-  parseAbi, decodeEventLog, formatUnits
+  createPublicClient, webSocket, getAddress, parseAbi,
+  decodeEventLog
 } from 'viem';
 
 const chain = Number(process.env.CHAIN_ID || 1);
@@ -28,7 +28,7 @@ const client = createPublicClient({
   chain: {
     id: chain,
     name: 'eth',
-    nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+    nativeCurrency: { name:'ETH', symbol:'ETH', decimals:18 },
     rpcUrls: { default: { http: [], webSocket: [process.env.RPC_URL] } }
   },
   transport: webSocket(process.env.RPC_URL)

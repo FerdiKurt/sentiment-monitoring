@@ -65,11 +65,12 @@ async function readPoolMeta(addr) {
   return { pool: norm(addr), fee: Number(fee), t0: tok0, t1: tok1 };
 }
 
-function priceFromAmounts(a0, a1, d0, d1) {
-  const x0 = Number(a0) / 10**d0;
-  const x1 = Number(a1) / 10**d1;
-  if (!x0 || !x1) return null;
-  return Math.abs(x1 / x0); // quote/base
+function priceFromSqrt(sqrtPriceX96, d0, d1) {
+  // price token1/token0
+  // p = (sqrtPriceX96^2 / 2^192) * 10^(d0 - d1)
+  const SQ = Number(sqrtPriceX96) / (2 ** 96);
+  const p = (SQ * SQ) * (10 ** (d0 - d1));
+  return p;
 }
 
 function usdFromQuote(symbol, amount1, d1) {

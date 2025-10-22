@@ -73,30 +73,18 @@ function priceFromSqrt(sqrtPriceX96, d0, d1) {
   return p;
 }
 
-function usdFromQuote(symbol, amount1, d1) {
-  if (!['USDC','USDT','DAI'].includes(symbol)) return null;
-  return Math.abs(Number(amount1) / 10**d1);
+function setUsd(addr, pxUsd) {
+  const key = addr.toLowerCase();
+  priceBook.set(key, { pxUsd, tsMs: Date.now() });
+}
+function getUsd(addr) {
+  const key = addr.toLowerCase();
+  const v = priceBook.get(key);
+  if (!v) return null;
+  if (Date.now() - v.tsMs > TTL) { priceBook.delete(key); return null; }
+  return v.pxUsd;
 }
 
-(async () => {
-  const poolsEnv = (process.env.UNIV3_POOLS || '').split(',').map(s => s.trim()).filter(Boolean);
-  if (!poolsEnv.length) {
-    console.error('UNIV3_POOLS empty. Example: 0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8@3000');
-    process.exit(1);
-  }
-
-  await producer.connect();
-
-  const metas = [];
-  for (const token of poolsEnv) {
-    const [addr] = token.split('@');
-    const m = await readPoolMeta(addr);
-    metas.push(m);
-    console.log(`watching pool ${m.pool} (${m.t0.symbol}/${m.t1.symbol}) fee=${m.fee}`);
-  }
-
-  client.watchEvent({
-    address: metas.map(m => m.pool),
     abi: UNIV3_SWAP_ABI,
     onLogs: async (logs) => {
       for (const log of logs) {

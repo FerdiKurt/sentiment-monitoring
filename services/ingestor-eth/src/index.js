@@ -34,6 +34,16 @@ const client = createPublicClient({
   transport: webSocket(process.env.RPC_URL)
 });
 
+const STABLES = new Set((process.env.STABLE_TOKEN_ADDRESSES||'').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean));
+const WETH = (process.env.WETH_ADDRESS||'').toLowerCase();
+const TOPIC_SWAPS = 'dex.swaps';
+const TOPIC_POOLS = 'dex.pools';
+
+const watchers = new Map(); // pool => unwatch()
+const meta = new Map();     // pool => {t0,t1,fee}
+const priceBook = new Map(); // tokenAddrLower => {pxUsd, tsMs}
+const TTL = Number(process.env.PRICE_TTL_SEC || 600) * 1000;
+
 function norm(a){ return getAddress(a); }
 
 async function readToken(addr) {
